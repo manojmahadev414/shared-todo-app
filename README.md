@@ -8,6 +8,7 @@ A multi-user task app with private lists and opt-in sharing. Users can register 
 - Better Auth with its Prisma adapter and username plugin
 - MySQL data model managed by Prisma
 - Email/password sign-up and sign-in screens
+- Email verification, password recovery, and editable account settings
 - New accounts receive a private default list
 - Authenticated dashboard with list creation and full task create/edit/complete/delete
 - Task descriptions, due dates, and low/normal/high priority
@@ -19,7 +20,7 @@ A multi-user task app with private lists and opt-in sharing. Users can register 
 ## Local setup
 
 1. Use Node.js 22 or newer.
-2. Copy `.env.example` to `.env.local` and set a reachable MySQL `DATABASE_URL`, `BETTER_AUTH_URL`, and a random `BETTER_AUTH_SECRET`.
+2. Copy `.env.example` to `.env.local` and set a reachable MySQL `DATABASE_URL`, `BETTER_AUTH_URL`, and a random `BETTER_AUTH_SECRET`. Configure the `SMTP_*` values to send account verification, email change, and password recovery links. When SMTP is not set in local development, links are printed to the Next.js terminal; production requires SMTP configuration.
 3. Install dependencies with `npm install`.
 4. Validate and generate the Prisma client: `npm run db:validate && npm run db:generate`.
 5. Create the first migration against your development database: `npm run db:migrate -- --name init`.
@@ -32,4 +33,4 @@ To enable Google sign-in, configure `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET
 - Invitations are by username and require acceptance before list access is granted.
 - List roles are owner, editor, and viewer. Every list read or change must enforce membership and role on the server.
 - The initial Prisma migration is checked in; apply it to each configured database with `npm run db:migrate`.
-- Editable account settings and production deployment remain to be implemented.
+- Google OAuth remains optional and requires provider credentials.
