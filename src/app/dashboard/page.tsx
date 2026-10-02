@@ -1,8 +1,34 @@
 import Link from "next/link";
+import { Task, TaskPriority } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { createList, createTask, toggleTask } from "./actions";
 import { SignOutButton } from "./sign-out-button";
+import { TaskEditor } from "./task-editor";
+
+const priorityLabels: Record<TaskPriority, string> = {
+  LOW: "Low",
+  NORMAL: "Normal",
+  HIGH: "High",
+};
+
+function TaskItem({ task, canEdit }: { task: Task; canEdit: boolean }) {
+  const dueDateValue = task.dueAt ? task.dueAt.toISOString().slice(0, 10) : "";
+  return <div className={`task-item ${task.completedAt ? "task-done" : ""}`}>
+    <div className="task-row">
+      {canEdit ? <form action={toggleTask}><input type="hidden" name="taskId" value={task.id}/><button className="task-check" aria-label={task.completedAt ? "Mark task incomplete" : "Complete task"}>{task.completedAt ? "✓" : ""}</button></form> : <span className="task-check static-check" aria-hidden="true">{task.completedAt ? "✓" : ""}</span>}
+      <span className="task-title">{task.title}</span>
+      <span className={`priority-badge priority-${task.priority.toLowerCase()}`}>{priorityLabels[task.priority]}</span>
+      {task.dueAt && <time dateTime={dueDateValue}>{task.dueAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</time>}
+      {canEdit && <TaskEditor taskId={task.id} title={task.title} description={task.description ?? ""} dueAt={dueDateValue} priority={task.priority}/>}
+    </div>
+    {task.description && <p className="task-description">{task.description}</p>}
+  </div>;
+}
+
+function NewTaskForm({ listId, listName }: { listId: string; listName: string }) {
+  return <form action={createTask} className="new-task-form"><input type="hidden" name="listId" value={listId}/><div className="new-task-main"><input name="title" placeholder="Add a task…" aria-label={`Add task to ${listName}`} maxLength={200} required/><button aria-label="Add task">+</button></div><details className="task-extra-fields"><summary>Description, due date, priority</summary><label>Description<textarea name="description" maxLength={5000} rows={2} placeholder="Add a little more detail"/></label><div className="task-edit-fields"><label>Due date<input type="date" name="dueAt"/></label><label>Priority<select name="priority" defaultValue="NORMAL"><option value="LOW">Low</option><option value="NORMAL">Normal</option><option value="HIGH">High</option></select></label></div></details></form>;
+}
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -22,7 +48,7 @@ export default async function DashboardPage() {
       const role = list.ownerId === user.id ? "OWNER" : list.memberships[0]?.role ?? "VIEWER";
       const canEdit = role === "OWNER" || role === "EDITOR";
       const remaining = list.tasks.filter((task) => !task.completedAt).length;
-      return <article className="list-card" key={list.id}><header className="list-card-header"><div><h2>{list.name}</h2><p>{remaining} open · {role.toLowerCase()}</p></div><span className="list-dot" aria-hidden="true"></span></header><div className="task-list">{list.tasks.length === 0 && <p className="list-empty">Nothing here yet.</p>}{list.tasks.map((task) => <div className={`task-row ${task.completedAt ? "task-done" : ""}`} key={task.id}>{canEdit ? <form action={toggleTask}><input type="hidden" name="taskId" value={task.id}/><button className="task-check" aria-label={task.completedAt ? "Mark task incomplete" : "Complete task"}>{task.completedAt ? "✓" : ""}</button></form> : <span className="task-check static-check">{task.completedAt ? "✓" : ""}</span>}<span>{task.title}</span>{task.dueAt && <time>{task.dueAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</time>}</div>)}</div>{canEdit && <form action={createTask} className="new-task-form"><input type="hidden" name="listId" value={list.id}/><input name="title" placeholder="Add a task…" aria-label={`Add task to ${list.name}`} maxLength={200} required/><button aria-label="Add task">+</button></form>}</article>;
+      return <article className="list-card" key={list.id}><header className="list-card-header"><div><h2>{list.name}</h2><p>{remaining} open · {role.toLowerCase()}</p></div><span className="list-dot" aria-hidden="true"></span></header><div className="task-list">{list.tasks.length === 0 && <p className="list-empty">Nothing here yet.</p>}{list.tasks.map((task) => <TaskItem key={task.id} task={task} canEdit={canEdit}/>)}</div>{canEdit && <NewTaskForm listId={list.id} listName={list.name}/>}</article>;
     })}</section>}
   </main>;
 }
