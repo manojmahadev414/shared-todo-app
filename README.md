@@ -11,6 +11,7 @@ A multi-user task app with private lists and opt-in sharing. Users can register 
 - New accounts receive a private default list
 - Authenticated dashboard with list creation and full task create/edit/complete/delete
 - Task descriptions, due dates, and low/normal/high priority
+- Username invitations with accept/decline, role selection, and owner member controls
 - Server actions check owner/editor access before task changes
 - Responsive landing page
 
@@ -30,4 +31,4 @@ To enable Google sign-in, configure `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET
 - Invitations are by username and require acceptance before list access is granted.
 - List roles are owner, editor, and viewer. Every list read or change must enforce membership and role on the server.
 - The initial Prisma migration is checked in; apply it to each configured database with `npm run db:migrate`.
-- Invitation workflows, member management, account settings, and production deployment remain to be implemented.
+- Account settings and production deployment remain to be implemented.
