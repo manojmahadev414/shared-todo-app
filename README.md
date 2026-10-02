@@ -1,43 +1,30 @@
 # Shared To-Do App
 
-Early project foundation for a multi-user task app with shareable lists.
+A multi-user task app with private lists and opt-in sharing. Users can register with email/password and a unique username; Google sign-in is enabled when OAuth credentials are configured.
 
-## Product decisions
+## Current foundation
 
-- Users can register with email/password or Google and choose a unique username.
-- Each account has a private default list.
-- Users can create additional lists and invite existing users by username.
-- Invitations require acceptance before list access is granted.
-- List roles: owner, editor, viewer. Invites default to viewer; the sender may choose editor.
-- Tasks have title, optional description and due date, completion state, priority (low/normal/high), creator, and timestamps.
-- Every server operation must verify list membership and role. Hiding controls in the UI is not an authorization check.
-- Vercel hosts the Next.js app initially. MySQL is an external database reachable securely by the app. A later move to a VPS should require configuration changes, not a rewrite.
+- Next.js App Router with TypeScript
+- Better Auth with its Prisma adapter and username plugin
+- MySQL data model managed by Prisma
+- Email/password sign-up and sign-in screens
+- New accounts receive a private default list
+- Responsive landing page
 
-## Planned stack
+## Local setup
 
-- Next.js App Router and TypeScript
-- MySQL
-- Prisma ORM
-- Better Auth for password and Google sign-in, with username support
-- Vercel for initial application deployment
+1. Use Node.js 22 or newer.
+2. Copy `.env.example` to `.env.local` and set a reachable MySQL `DATABASE_URL`, `BETTER_AUTH_URL`, and a random `BETTER_AUTH_SECRET`.
+3. Install dependencies with `npm install`.
+4. Validate and generate the Prisma client: `npm run db:validate && npm run db:generate`.
+5. Create the first migration against your development database: `npm run db:migrate -- --name init`.
+6. Start the app with `npm run dev`.
 
-## First-release screens
+To enable Google sign-in, configure `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` with credentials whose redirect URI is `${BETTER_AUTH_URL}/api/auth/callback/google`. Keep all secrets in local or deployment environment variables; never commit them.
 
-1. Sign up/sign in
-2. My tasks, with today/upcoming filters
-3. Lists overview and list creation
-4. List detail with task CRUD, priority, and due date
-5. Invitations inbox (accept/decline)
-6. List member management and role selection
-7. Account settings
+## Product and security notes
 
-Reminders, recurring tasks, comments, and attachments are deferred until after the core sharing flow works.
-
-## Local setup (once Node.js and a MySQL database are available)
-
-1. Copy `.env.example` to `.env.local` and fill in the database URL, application URL, and auth secrets. Never commit `.env.local`.
-2. Install dependencies and generate Prisma client.
-3. Apply migrations to the development database.
-4. Start the Next.js development server.
-
-The source files and runtime have not yet been installed or verified in this environment. This workspace currently has no Node.js, npm, or Git executable and no application repository connected.
+- Invitations are by username and require acceptance before list access is granted.
+- List roles are owner, editor, and viewer. Every list read or change must enforce membership and role on the server.
+- The initial schema is validated, but migrations have not been applied because no development database has been configured.
+- Authorization, task CRUD, invitations, list management, and production deployment are still to be implemented.

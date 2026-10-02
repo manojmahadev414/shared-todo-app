@@ -11,4 +11,5 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
+*.tsbuildinfo
 PROJECT_CONTEXT.md
