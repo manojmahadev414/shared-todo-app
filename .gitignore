@@ -5,6 +5,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+.mysql.local.env
 /coverage/
 /prisma/*.db
 /prisma/*.db-journal
