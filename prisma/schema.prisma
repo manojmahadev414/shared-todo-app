@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum ListRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  REVOKED
+  EXPIRED
+}
+
+enum TaskPriority {
+  LOW
+  NORMAL
+  HIGH
+}
+
+model User {
+  id                    String        @id @default(cuid())
+  name                  String
+  email                 String        @unique
+  emailVerified         Boolean       @default(false)
+  image                 String?       @db.Text
+  username              String        @unique @db.VarChar(32)
+  displayUsername       String?       @db.VarChar(32)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  sessions              Session[]
+  accounts              Account[]
+  ownedLists            TaskList[]    @relation("ListOwner")
+  memberships           ListMember[]
+  sentInvitations       Invitation[]  @relation("InvitationSender")
+  receivedInvitations   Invitation[]  @relation("InvitationRecipient")
+  createdTasks          Task[]        @relation("TaskCreator")
+
+  @@map("user")
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  expiresAt  DateTime
+  token      String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  ipAddress  String?  @db.Text
+  userAgent  String?  @db.Text
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?   @db.Text
+  password              String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String   @db.Text
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model TaskList {
+  id          String       @id @default(cuid())
+  name        String       @db.VarChar(100)
+  ownerId     String
+  owner       User         @relation("ListOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  isDefault   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  memberships ListMember[]
+  invitations Invitation[]
+  tasks       Task[]
+
+  @@index([ownerId])
+  @@map("task_list")
+}
+
+model ListMember {
+  id        String   @id @default(cuid())
+  listId    String
+  userId    String
+  role      ListRole @default(VIEWER)
+  joinedAt  DateTime @default(now())
+  list      TaskList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([listId, userId])
+  @@index([userId])
+  @@map("list_member")
+}
+
+model Invitation {
+  id            String           @id @default(cuid())
+  listId        String
+  senderId      String
+  recipientId   String
+  role          ListRole         @default(VIEWER)
+  status        InvitationStatus @default(PENDING)
+  createdAt     DateTime         @default(now())
+  respondedAt   DateTime?
+  expiresAt     DateTime
+  list          TaskList         @relation(fields: [listId], references: [id], onDelete: Cascade)
+  sender        User             @relation("InvitationSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient     User             @relation("InvitationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, status])
+  @@index([listId, status])
+  @@index([senderId])
+  @@map("invitation")
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  listId      String
+  creatorId   String?
+  title       String       @db.VarChar(200)
+  description String?      @db.Text
+  priority    TaskPriority @default(NORMAL)
+  dueAt       DateTime?
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  list        TaskList     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  creator     User?        @relation("TaskCreator", fields: [creatorId], references: [id], onDelete: SetNull)
+
+  @@index([listId, completedAt, dueAt])
+  @@index([creatorId])
+  @@map("task")
+}

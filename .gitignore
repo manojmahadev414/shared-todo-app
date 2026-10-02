@@ -1,0 +1,14 @@
+node_modules/
+.next/
+/out/
+/.vercel/
+.env
+.env.*
+!.env.example
+/coverage/
+/prisma/*.db
+/prisma/*.db-journal
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+PROJECT_CONTEXT.md
