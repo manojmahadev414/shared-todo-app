@@ -9,6 +9,8 @@ A multi-user task app with private lists and opt-in sharing. Users can register 
 - MySQL data model managed by Prisma
 - Email/password sign-up and sign-in screens
 - New accounts receive a private default list
+- Authenticated dashboard with list creation and task creation/completion
+- Server actions check owner/editor access before task changes
 - Responsive landing page
 
 ## Local setup
@@ -27,4 +29,4 @@ To enable Google sign-in, configure `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET
 - Invitations are by username and require acceptance before list access is granted.
 - List roles are owner, editor, and viewer. Every list read or change must enforce membership and role on the server.
 - The initial schema is validated, but migrations have not been applied because no development database has been configured.
-- Authorization, task CRUD, invitations, list management, and production deployment are still to be implemented.
+- Full task editing/deletion, invitation workflows, member management, account settings, and production deployment remain to be implemented.
