@@ -3,10 +3,10 @@ import { Task, TaskPriority } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { createList, createTask, toggleTask } from "./actions";
-import { SignOutButton } from "./sign-out-button";
 import { TaskEditor } from "./task-editor";
 import { ListSharing } from "./list-sharing";
 import { MasonryGrid } from "./masonry-grid";
+import { ProfileMenu } from "./profile-menu";
 
 const priorityLabels: Record<TaskPriority, string> = {
   LOW: "Low",
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
   }), prisma.invitation.count({ where: { recipientId: user.id, status: "PENDING", expiresAt: { gt: now } } })]);
   const openCount = lists.reduce((total, list) => total + list.tasks.filter((task) => !task.completedAt).length, 0);
   return <main className="dashboard-shell">
-    <header className="dashboard-header"><Link href="/" className="dashboard-brand"><span className="brand-mark small-mark">✓</span> Shared To-Do</Link><div className="user-area"><Link href="/invitations" className="invitation-link">Invitations{pendingInvitationCount > 0 && <span>{pendingInvitationCount}</span>}</Link><Link href="/profile" className="profile-nav-link" aria-label="Open profile" title="Profile"><span>{user.name.trim().charAt(0).toUpperCase() || "?"}</span></Link><SignOutButton /></div></header>
+    <header className="dashboard-header"><Link href="/" className="dashboard-brand"><span className="brand-mark small-mark">✓</span> Shared To-Do</Link><div className="user-area"><Link href="/invitations" className="invitation-link" aria-label={pendingInvitationCount > 0 ? `Invitations, ${pendingInvitationCount} pending` : "Invitations"} title="Invitations"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>{pendingInvitationCount > 0 && <span>{pendingInvitationCount}</span>}</Link><ProfileMenu name={user.name}/></div></header>
     <section className="dashboard-heading"><div><p className="eyebrow">YOUR SPACE</p><h1>Good to see you, {user.name.split(" ")[0]}.</h1><p className="intro">{openCount ? `You have ${openCount} open ${openCount === 1 ? "task" : "tasks"} across your lists.` : "Everything is caught up. Add a task when you’re ready."}</p></div><form action={createList} className="new-list-form"><input name="name" aria-label="New list name" placeholder="Name a new list" maxLength={100} required /><button className="button button-primary">Add list</button></form></section>
     {lists.length === 0 ? <p className="empty-state">Your lists will appear here.</p> : <MasonryGrid>{lists.map((list) => {
       const role = list.ownerId === user.id ? "OWNER" : list.memberships.find((member) => member.userId === user.id)?.role ?? "VIEWER";

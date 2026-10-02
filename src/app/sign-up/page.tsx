@@ -13,7 +13,7 @@ export default function SignUpPage() {
     event.preventDefault(); setError(""); setBusy(true);
     const data = new FormData(event.currentTarget);
     const result = await authClient.signUp.email({ name: String(data.get("name")), email: String(data.get("email")), password: String(data.get("password")), username: String(data.get("username")), callbackURL: "/" });
-    setBusy(false); if (result.error) setError(result.error.message ?? "Could not create account."); else router.push("/");
+    setBusy(false); if (result.error) setError(result.error.message ?? "Could not create account."); else router.push(`/verify-email?email=${encodeURIComponent(String(data.get("email")))}`);
   }
   async function signUpWithGoogle() {
     setError("");
