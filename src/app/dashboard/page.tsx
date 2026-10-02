@@ -6,6 +6,7 @@ import { createList, createTask, toggleTask } from "./actions";
 import { SignOutButton } from "./sign-out-button";
 import { TaskEditor } from "./task-editor";
 import { ListSharing } from "./list-sharing";
+import { MasonryGrid } from "./masonry-grid";
 
 const priorityLabels: Record<TaskPriority, string> = {
   LOW: "Low",
@@ -45,13 +46,13 @@ export default async function DashboardPage() {
   }), prisma.invitation.count({ where: { recipientId: user.id, status: "PENDING", expiresAt: { gt: now } } })]);
   const openCount = lists.reduce((total, list) => total + list.tasks.filter((task) => !task.completedAt).length, 0);
   return <main className="dashboard-shell">
-    <header className="dashboard-header"><Link href="/" className="dashboard-brand"><span className="brand-mark small-mark">✓</span> Shared To-Do</Link><div className="user-area"><Link href="/invitations" className="invitation-link">Invitations{pendingInvitationCount > 0 && <span>{pendingInvitationCount}</span>}</Link><span>{user.name}</span><SignOutButton /></div></header>
+    <header className="dashboard-header"><Link href="/" className="dashboard-brand"><span className="brand-mark small-mark">✓</span> Shared To-Do</Link><div className="user-area"><Link href="/invitations" className="invitation-link">Invitations{pendingInvitationCount > 0 && <span>{pendingInvitationCount}</span>}</Link><Link href="/profile" className="profile-nav-link" aria-label="Open profile" title="Profile"><span>{user.name.trim().charAt(0).toUpperCase() || "?"}</span></Link><SignOutButton /></div></header>
     <section className="dashboard-heading"><div><p className="eyebrow">YOUR SPACE</p><h1>Good to see you, {user.name.split(" ")[0]}.</h1><p className="intro">{openCount ? `You have ${openCount} open ${openCount === 1 ? "task" : "tasks"} across your lists.` : "Everything is caught up. Add a task when you’re ready."}</p></div><form action={createList} className="new-list-form"><input name="name" aria-label="New list name" placeholder="Name a new list" maxLength={100} required /><button className="button button-primary">Add list</button></form></section>
-    {lists.length === 0 ? <p className="empty-state">Your lists will appear here.</p> : <section className="list-grid" aria-label="Your task lists">{lists.map((list) => {
+    {lists.length === 0 ? <p className="empty-state">Your lists will appear here.</p> : <MasonryGrid>{lists.map((list) => {
       const role = list.ownerId === user.id ? "OWNER" : list.memberships.find((member) => member.userId === user.id)?.role ?? "VIEWER";
       const canEdit = role === "OWNER" || role === "EDITOR";
       const remaining = list.tasks.filter((task) => !task.completedAt).length;
       return <article className="list-card" key={list.id}><header className="list-card-header"><div><h2>{list.name}</h2><p>{remaining} open · {role.toLowerCase()}</p></div><span className="list-dot" aria-hidden="true"></span></header><div className="task-list">{list.tasks.length === 0 && <p className="list-empty">Nothing here yet.</p>}{list.tasks.map((task) => <TaskItem key={task.id} task={task} canEdit={canEdit}/>)}</div>{canEdit && <NewTaskForm listId={list.id} listName={list.name}/>} {role === "OWNER" && <ListSharing listId={list.id} members={list.memberships} invitations={list.invitations}/>}</article>;
-    })}</section>}
+    })}</MasonryGrid>}
   </main>;
 }
