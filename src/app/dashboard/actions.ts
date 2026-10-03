@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { TaskPriority } from "@prisma/client";
+import { ListRole, TaskPriority } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 
@@ -46,6 +46,12 @@ function parseDescription(value: FormDataEntryValue | null) {
   return description || null;
 }
 
+function refreshTaskViews() {
+  revalidatePath("/dashboard");
+  revalidatePath("/today");
+  revalidatePath("/upcoming");
+}
+
 export async function createTask(formData: FormData) {
   const user = await requireUser();
   const listId = String(formData.get("listId") ?? "");
@@ -61,7 +67,7 @@ export async function createTask(formData: FormData) {
       priority: parsePriority(formData.get("priority")),
     },
   });
-  revalidatePath("/dashboard");
+  refreshTaskViews();
 }
 
 export async function updateTask(formData: FormData) {
@@ -80,7 +86,7 @@ export async function updateTask(formData: FormData) {
       priority: parsePriority(formData.get("priority")),
     },
   });
-  revalidatePath("/dashboard");
+  refreshTaskViews();
 }
 
 export async function deleteTask(formData: FormData) {
@@ -90,7 +96,7 @@ export async function deleteTask(formData: FormData) {
   if (!task) throw new Error("Task not found.");
   await requireTaskEditor(task.listId, user.id);
   await prisma.task.delete({ where: { id: task.id } });
-  revalidatePath("/dashboard");
+  refreshTaskViews();
 }
 
 export async function toggleTask(formData: FormData) {
@@ -100,7 +106,7 @@ export async function toggleTask(formData: FormData) {
   if (!task) throw new Error("Task not found.");
   await requireTaskEditor(task.listId, user.id);
   await prisma.task.update({ where: { id: task.id }, data: { completedAt: task.completedAt ? null : new Date() } });
-  revalidatePath("/dashboard");
+  refreshTaskViews();
 }
 
 export async function createList(formData: FormData) {
@@ -109,4 +115,69 @@ export async function createList(formData: FormData) {
   if (!name || name.length > 100) throw new Error("Enter a list name up to 100 characters.");
   await prisma.taskList.create({ data: { name, ownerId: user.id } });
   revalidatePath("/dashboard");
+}
+
+function refreshListViews() {
+  revalidatePath("/dashboard");
+  revalidatePath("/today");
+  revalidatePath("/upcoming");
+  revalidatePath("/invitations");
+}
+
+export async function transferListOwnership(formData: FormData) {
+  const user = await requireUser();
+  const listId = String(formData.get("listId") ?? "");
+  const memberId = String(formData.get("memberId") ?? "");
+  if (!listId || !memberId) throw new Error("Choose a member to own this list.");
+
+  await prisma.$transaction(async (tx) => {
+    const list = await tx.taskList.findUnique({ where: { id: listId }, select: { id: true, ownerId: true, isDefault: true } });
+    if (!list || list.ownerId !== user.id) throw new Error("Only the list owner can transfer ownership.");
+    if (list.isDefault) throw new Error("Your default list cannot be transferred.");
+    const member = await tx.listMember.findFirst({ where: { id: memberId, listId }, select: { userId: true } });
+    if (!member || member.userId === user.id) throw new Error("Choose a current member of this list.");
+
+    await tx.taskList.update({ where: { id: listId }, data: { ownerId: member.userId } });
+    await tx.listMember.delete({ where: { id: memberId } });
+    await tx.listMember.upsert({
+      where: { listId_userId: { listId, userId: user.id } },
+      create: { listId, userId: user.id, role: ListRole.EDITOR },
+      update: { role: ListRole.EDITOR },
+    });
+    await tx.invitation.updateMany({
+      where: { listId, status: "PENDING" },
+      data: { status: "REVOKED", respondedAt: new Date() },
+    });
+  });
+  refreshListViews();
+}
+
+export async function leaveList(formData: FormData) {
+  const user = await requireUser();
+  const listId = String(formData.get("listId") ?? "");
+  if (!listId) throw new Error("Choose a list to leave.");
+
+  await prisma.$transaction(async (tx) => {
+    const list = await tx.taskList.findUnique({ where: { id: listId }, select: { ownerId: true } });
+    if (!list) throw new Error("List not found.");
+    if (list.ownerId === user.id) throw new Error("Transfer ownership before leaving your list.");
+    const membership = await tx.listMember.findUnique({ where: { listId_userId: { listId, userId: user.id } }, select: { id: true } });
+    if (!membership) throw new Error("You are not a member of this list.");
+    await tx.listMember.delete({ where: { id: membership.id } });
+  });
+  refreshListViews();
+}
+
+export async function deleteList(formData: FormData) {
+  const user = await requireUser();
+  const listId = String(formData.get("listId") ?? "");
+  if (!listId) throw new Error("Choose a list to delete.");
+
+  await prisma.$transaction(async (tx) => {
+    const list = await tx.taskList.findUnique({ where: { id: listId }, select: { ownerId: true, isDefault: true } });
+    if (!list || list.ownerId !== user.id) throw new Error("Only the list owner can delete it.");
+    if (list.isDefault) throw new Error("Your default list cannot be deleted.");
+    await tx.taskList.delete({ where: { id: listId } });
+  });
+  refreshListViews();
 }

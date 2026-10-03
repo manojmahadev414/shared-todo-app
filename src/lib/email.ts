@@ -18,7 +18,7 @@ function getTransporter() {
 export async function sendAuthEmail(to: string, subject: string, url: string) {
   const smtp = getTransporter();
   if (!smtp) {
-    if (process.env.NODE_ENV === "development" || process.env.PLAYWRIGHT_TEST === "true") {
+    if (process.env.NODE_ENV === "development") {
       console.info(`[Shared To-Do] ${subject} for ${to}: ${url}`);
       return;
     }

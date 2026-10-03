@@ -2,11 +2,15 @@ import { defineConfig, devices } from "@playwright/test";
 import { loadEnvConfig } from "@next/env";
 
 loadEnvConfig(process.cwd());
-process.env.PLAYWRIGHT_TEST = "true";
-process.env.SMTP_HOST = "";
-process.env.SMTP_USER = "";
-process.env.SMTP_PASSWORD = "";
-process.env.SMTP_FROM = "";
+Object.assign(process.env, {
+  BETTER_AUTH_URL: "http://localhost:3100",
+  SMTP_HOST: "127.0.0.1",
+  SMTP_PORT: "2525",
+  SMTP_SECURE: "false",
+  SMTP_USER: "e2e",
+  SMTP_PASSWORD: "e2e",
+  SMTP_FROM: "Shared To-Do E2E <test@example.test>",
+});
 
 export default defineConfig({
   testDir: "./e2e",
@@ -18,17 +22,9 @@ export default defineConfig({
     ...devices["Desktop Chrome"],
   },
   webServer: {
-    command: "npm run dev -- --port 3100",
+    command: "node e2e/start-server.mjs",
     url: "http://localhost:3100",
     reuseExistingServer: false,
     timeout: 120_000,
-    env: {
-      PLAYWRIGHT_TEST: "true",
-      BETTER_AUTH_URL: "http://localhost:3100",
-      SMTP_HOST: "",
-      SMTP_USER: "",
-      SMTP_PASSWORD: "",
-      SMTP_FROM: "",
-    },
   },
 });
