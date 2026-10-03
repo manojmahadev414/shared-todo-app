@@ -33,7 +33,7 @@ model User {
   email                 String        @unique
   emailVerified         Boolean       @default(false)
   image                 String?       @db.Text
-  username              String        @unique @db.VarChar(32)
+  username              String?       @unique @db.VarChar(32)
   displayUsername       String?       @db.VarChar(32)
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt

@@ -26,6 +26,10 @@ A multi-user task app with private lists and opt-in sharing. Users can register 
 5. Create the first migration against your development database: `npm run db:migrate -- --name init`.
 6. Start the app with `npm run dev`.
 
+## Browser automation
+
+The Playwright suite runs against a local development server and the configured MySQL database. Install its browser once with `npx playwright install chromium`, then run `npm run test:e2e`. E2E setup creates and removes test accounts; it disables SMTP sending and uses the development email-link fallback.
+
 To enable Google sign-in, configure `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` with credentials whose redirect URI is `${BETTER_AUTH_URL}/api/auth/callback/google`. Keep all secrets in local or deployment environment variables; never commit them.
 
 ## Product and security notes
