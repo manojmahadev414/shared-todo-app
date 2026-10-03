@@ -5,8 +5,8 @@ import { changeMemberRole, revokeInvitation, sendInvitation } from "@/app/sharin
 import { RemoveMemberButton } from "./remove-member-button";
 
 type Role = "OWNER" | "EDITOR" | "VIEWER";
-type Member = { id: string; role: Role; user: { name: string; username: string } };
-type PendingInvitation = { id: string; role: Role; expiresAt: Date; recipient: { name: string; username: string } };
+type Member = { id: string; role: Role; user: { name: string; username: string | null } };
+type PendingInvitation = { id: string; role: Role; expiresAt: Date; recipient: { name: string; username: string | null } };
 
 export function ListSharing({ listId, members, invitations }: {
   listId: string;
@@ -55,12 +55,12 @@ export function ListSharing({ listId, members, invitations }: {
         </form>
 
         {members.length > 0 && <div className="sharing-section"><h3>Members</h3>{members.map((member) => <div className="member-row" key={member.id}>
-          <div className="member-identity"><strong>{member.user.name}</strong><span>@{member.user.username}</span></div>
-          <form action={changeMemberRole} className="member-role-form"><input type="hidden" name="listId" value={listId}/><input type="hidden" name="memberId" value={member.id}/><select aria-label={`Access for ${member.user.username}`} name="role" defaultValue={member.role}><option value="VIEWER">Viewer</option><option value="EDITOR">Editor</option></select><button>Save</button></form>
-          <RemoveMemberButton listId={listId} memberId={member.id} name={member.user.name} username={member.user.username}/>
+          <div className="member-identity"><strong>{member.user.name}</strong><span>{member.user.username ? `@${member.user.username}` : "Username not set"}</span></div>
+          <form action={changeMemberRole} className="member-role-form"><input type="hidden" name="listId" value={listId}/><input type="hidden" name="memberId" value={member.id}/><select aria-label={`Access for ${member.user.username ?? member.user.name}`} name="role" defaultValue={member.role}><option value="VIEWER">Viewer</option><option value="EDITOR">Editor</option></select><button>Save</button></form>
+          <RemoveMemberButton listId={listId} memberId={member.id} name={member.user.name} username={member.user.username ?? ""}/>
         </div>)}</div>}
 
-        {invitations.length > 0 && <div className="sharing-section"><h3>Pending invitations</h3>{invitations.map((invitation) => <div className="pending-invite-row" key={invitation.id}><div><strong>@{invitation.recipient.username}</strong><span>{invitation.role === "EDITOR" ? "Editor" : "Viewer"} · expires {invitation.expiresAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span></div><form action={revokeInvitation}><input type="hidden" name="listId" value={listId}/><input type="hidden" name="invitationId" value={invitation.id}/><button className="remove-member-button">Revoke</button></form></div>)}</div>}
+        {invitations.length > 0 && <div className="sharing-section"><h3>Pending invitations</h3>{invitations.map((invitation) => <div className="pending-invite-row" key={invitation.id}><div><strong>{invitation.recipient.username ? `@${invitation.recipient.username}` : invitation.recipient.name}</strong><span>{invitation.role === "EDITOR" ? "Editor" : "Viewer"} · expires {invitation.expiresAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span></div><form action={revokeInvitation}><input type="hidden" name="listId" value={listId}/><input type="hidden" name="invitationId" value={invitation.id}/><button className="remove-member-button">Revoke</button></form></div>)}</div>}
       </div>
     </div>
   </section>;

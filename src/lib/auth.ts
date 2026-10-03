@@ -40,7 +40,10 @@ export const auth = betterAuth({
   socialProviders: googleClientId && googleClientSecret ? {
     google: { clientId: googleClientId, clientSecret: googleClientSecret },
   } : {},
-  plugins: [username()],
+  plugins: [username({
+    maxUsernameLength: 32,
+    usernameValidator: (value) => /^[a-zA-Z0-9_.]{3,32}$/.test(value),
+  })],
   databaseHooks: {
     user: {
       create: {
