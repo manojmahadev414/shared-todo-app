@@ -7,6 +7,9 @@ import { sendAuthEmail } from "@/lib/email";
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
+/** True only when both Google OAuth credentials are configured, so the UI can hide the button otherwise. */
+export const googleSignInEnabled = Boolean(googleClientId && googleClientSecret);
+
 export const auth = betterAuth({
   appName: "Shared To-Do",
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
