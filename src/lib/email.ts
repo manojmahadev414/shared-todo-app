@@ -19,7 +19,7 @@ export async function sendAuthEmail(to: string, subject: string, url: string) {
   const smtp = getTransporter();
   if (!smtp) {
     if (process.env.NODE_ENV === "development") {
-      console.info(`[Shared To-Do] ${subject} for ${to}: ${url}`);
+      console.info(`[TheDoList] ${subject} for ${to}: ${url}`);
       return;
     }
     throw new Error("SMTP email delivery is not configured.");
@@ -32,6 +32,6 @@ export async function sendAuthEmail(to: string, subject: string, url: string) {
     to,
     subject,
     text: `${subject}\n\nOpen this link to continue:\n${url}\n\nIf you did not request this, you can ignore this email.`,
-    html: `<p>${subject}</p><p><a href="${url}">Continue to Shared To-Do</a></p><p>If you did not request this, you can ignore this email.</p>`,
+    html: `<p>${subject}</p><p><a href="${url}">Continue to TheDoList</a></p><p>If you did not request this, you can ignore this email.</p>`,
   });
 }

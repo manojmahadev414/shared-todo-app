@@ -1,4 +1,4 @@
-# Shared To-Do App
+# TheDoList
 
 A multi-user task app with private lists and opt-in sharing. Users can register with email/password and a unique username; Google sign-in is enabled when OAuth credentials are configured.
 

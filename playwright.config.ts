@@ -9,7 +9,7 @@ Object.assign(process.env, {
   SMTP_SECURE: "false",
   SMTP_USER: "e2e",
   SMTP_PASSWORD: "e2e",
-  SMTP_FROM: "Shared To-Do E2E <test@example.test>",
+  SMTP_FROM: "TheDoList E2E <test@example.test>",
 });
 
 export default defineConfig({
