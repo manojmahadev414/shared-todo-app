@@ -17,11 +17,11 @@ export default async function ProfilePage() {
 
   return <main className="dashboard-shell profile-shell">
     <WorkspaceHeader userId={user.id} name={user.name} active="account"/>
-    <section className="profile-heading"><p className="eyebrow">YOUR ACCOUNT</p><h1>Profile</h1><p className="intro">Your account details in one place.</p></section>
+    <section className="profile-heading"><h1>Profile</h1><p className="intro">Your account details in one place.</p></section>
     <section className="profile-card" aria-label="Your profile details">
       <div className="profile-identity">
         <div className="profile-avatar">{user.image ? <Image src={user.image} alt={`${user.name}'s avatar`} width={104} height={104} unoptimized/> : <span>{initial || "?"}</span>}</div>
-        <div><p className="eyebrow">PROFILE</p><h2>{user.name}</h2><p className="profile-username">@{user.displayUsername || user.username}</p></div>
+        <div><h2>{user.name}</h2><p className="profile-username">@{user.displayUsername || user.username}</p></div>
       </div>
       <dl className="profile-details">
         <div><dt>Name</dt><dd>{user.name}</dd></div>

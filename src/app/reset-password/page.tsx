@@ -4,6 +4,7 @@ import { FormEvent, Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { ArrowLeftIcon } from "@/app/icons";
 
 export default function ResetPasswordPage() {
   return <Suspense fallback={<main className="auth-page" />}><ResetPasswordForm /></Suspense>;
@@ -27,5 +28,5 @@ function ResetPasswordForm() {
     else setMessage("Your password has been changed. You can now sign in.");
   }
 
-  return <main className="auth-page"><Link href="/sign-in" className="back-link">← Sign in</Link><section className="auth-card"><p className="eyebrow">ACCOUNT RECOVERY</p><h1>Choose a new<br/>password.</h1><p className="intro">Use at least 8 characters for your new password.</p>{!message && <form onSubmit={submit} className="auth-form"><label>New password<input name="password" type="password" autoComplete="new-password" minLength={8} required disabled={!token} /></label><label>Confirm new password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={8} required disabled={!token} /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="button button-primary" disabled={busy || !token}>{busy ? "Updating…" : "Update password"}</button></form>}{message && <p className="form-success" role="status">{message}</p>}<div className="auth-switch"><Link href="/forgot-password">Request another reset link</Link></div></section></main>;
+  return <main className="auth-page"><Link href="/sign-in" className="back-link"><ArrowLeftIcon/>Sign in</Link><section className="auth-card"><p className="eyebrow">ACCOUNT RECOVERY</p><h1>Choose a new<br/>password.</h1><p className="intro">Use at least 8 characters for your new password.</p>{!message && <form onSubmit={submit} className="auth-form"><label>New password<input name="password" type="password" autoComplete="new-password" minLength={8} required disabled={!token} /></label><label>Confirm new password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={8} required disabled={!token} /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="button button-primary" disabled={busy || !token}>{busy ? "Updating…" : "Update password"}</button></form>}{message && <p className="form-success" role="status">{message}</p>}<div className="auth-switch"><Link href="/forgot-password">Request another reset link</Link></div></section></main>;
 }
