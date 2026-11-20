@@ -6,7 +6,7 @@ A multi-user task app with private lists and opt-in sharing. Users can register 
 
 - Next.js App Router with TypeScript
 - Better Auth with its Prisma adapter and username plugin
-- MySQL data model managed by Prisma
+- PostgreSQL data model managed by Prisma
 - Email/password sign-up and sign-in screens
 - Email verification, password recovery, and editable account settings
 - New accounts receive a private default list
@@ -21,7 +21,7 @@ A multi-user task app with private lists and opt-in sharing. Users can register 
 ## Local setup
 
 1. Use Node.js 22 or newer.
-2. Copy `.env.example` to `.env.local` and set a reachable MySQL `DATABASE_URL`, `BETTER_AUTH_URL`, and a random `BETTER_AUTH_SECRET`. Configure the `SMTP_*` values to send account verification, email change, and password recovery links. When SMTP is not set in local development, links are printed to the Next.js terminal; production requires SMTP configuration.
+2. Start a local PostgreSQL, for example `docker run -d --name shared-todo-postgres -e POSTGRES_USER=shared_todo -e POSTGRES_PASSWORD=<password> -e POSTGRES_DB=shared_todo -p 127.0.0.1:5433:5432 postgres:17`. Copy `.env.example` to `.env.local` (and `.env`, which the Prisma CLI reads) and set `DATABASE_URL`, `BETTER_AUTH_URL`, and a random `BETTER_AUTH_SECRET`. Configure the `SMTP_*` values to send account verification, email change, and password recovery links. When SMTP is not set in local development, links are printed to the Next.js terminal; production requires SMTP configuration.
 3. Install dependencies with `npm install`.
 4. Validate and generate the Prisma client: `npm run db:validate && npm run db:generate`.
 5. Apply checked-in migrations to the database: `npm run db:deploy`. For local schema development, create a migration with `npm run db:migrate -- --name <migration-name>`.
@@ -29,7 +29,7 @@ A multi-user task app with private lists and opt-in sharing. Users can register 
 
 ## Browser automation
 
-The Playwright suite runs against a local development server and the configured MySQL database. Install its browser once with `npx playwright install chromium`, then run `npm run test:e2e`. E2E setup creates and removes test accounts and starts a local SMTP capture server so verification and recovery links are tested without sending email externally.
+The Playwright suite runs against a local development server and the configured PostgreSQL database. Install its browser once with `npx playwright install chromium`, then run `npm run test:e2e`. E2E setup creates and removes test accounts and starts a local SMTP capture server so verification and recovery links are tested without sending email externally.
 
 To enable Google sign-in, configure `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` with credentials whose redirect URI is `${BETTER_AUTH_URL}/api/auth/callback/google`. Keep all secrets in local or deployment environment variables; never commit them.
 
