@@ -366,3 +366,16 @@ select option { background: #1A0A52; color: var(--ink); }
 .button[aria-busy="true"], .new-task-main button[aria-busy="true"] { opacity: .75; transform: none; }
 .task-check[aria-busy="true"] { pointer-events: none; border-color: var(--cyan); animation: busy-ring 1s ease-in-out infinite; }
 @keyframes busy-ring { 50% { box-shadow: 0 0 0 4px rgba(0, 240, 255, .25); } }
+
+/* Legal pages and links */
+.legal-page { max-width: 760px; }
+.legal-card { max-width: 680px; }
+.legal-card h1 { font-size: clamp(36px, 6vw, 52px); }
+.legal-card h2 { margin: 26px 0 8px; color: var(--ink-strong); font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
+.legal-card p, .legal-card li { color: var(--muted); font-size: 15px; line-height: 1.65; }
+.legal-card p { margin: 0 0 10px; }
+.legal-card ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.legal-card strong { color: var(--ink); }
+.legal-card a, .note-link, .legal-note a { color: var(--cyan); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.legal-note { margin: 14px 0 0; color: var(--faint); font-size: 12px; text-align: center; }
+.legal-card .intro { max-width: none; margin-bottom: 8px; }
