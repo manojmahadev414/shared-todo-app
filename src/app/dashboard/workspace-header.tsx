@@ -12,7 +12,7 @@ export async function WorkspaceHeader({ userId, name, active }: { userId: string
   });
 
   return <header className="workspace-header">
-    <Link href="/dashboard" className="dashboard-brand"><span className="brand-mark small-mark"><CheckIcon/></span><span>Shared To-Do</span></Link>
+    <Link href="/dashboard" className="dashboard-brand"><span className="brand-mark small-mark"><CheckIcon/></span><span>TheDoList</span></Link>
     <nav className="workspace-nav" aria-label="Workspace">
       <Link href="/dashboard" aria-current={active === "lists" ? "page" : undefined}>My lists</Link>
       <Link href="/today" aria-current={active === "today" ? "page" : undefined}>Today</Link>

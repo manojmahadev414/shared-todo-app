@@ -14,7 +14,7 @@ async function home() {
     <main className="page-shell" aria-labelledby="welcome-title">
       <div className="hero-top">
         <div className="brand-mark" aria-hidden="true"><CheckIcon/></div>
-        <span className="hero-brand">Shared To-Do</span>
+        <span className="hero-brand">TheDoList</span>
         <nav className="hero-nav" aria-label="Account">
           <a href="/sign-in">Sign in</a>
           <a className="hero-nav-cta" href="/sign-up">Create an account</a>

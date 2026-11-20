@@ -11,7 +11,7 @@ const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 export const googleSignInEnabled = Boolean(googleClientId && googleClientSecret);
 
 export const auth = betterAuth({
-  appName: "Shared To-Do",
+  appName: "TheDoList",
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, { provider: "postgresql" }),
@@ -21,7 +21,7 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     revokeSessionsOnPasswordReset: true,
     sendResetPassword: async ({ user, url }) => {
-      await sendAuthEmail(user.email, "Reset your Shared To-Do password", url);
+      await sendAuthEmail(user.email, "Reset your TheDoList password", url);
     },
   },
   emailVerification: {
@@ -29,7 +29,7 @@ export const auth = betterAuth({
     sendOnSignIn: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      await sendAuthEmail(user.email, "Verify your Shared To-Do email", url);
+      await sendAuthEmail(user.email, "Verify your TheDoList email", url);
     },
   },
   user: {
