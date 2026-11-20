@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { acceptInvitation, declineInvitation } from "@/app/sharing/actions";
 import { WorkspaceHeader } from "@/app/dashboard/workspace-header";
+import { MailIcon } from "@/app/icons";
 
 export default async function InvitationsPage() {
   const user = await requireUser();
@@ -15,8 +16,8 @@ export default async function InvitationsPage() {
 
   return <main className="dashboard-shell">
     <WorkspaceHeader userId={user.id} name={user.name} active="invitations"/>
-    <section className="invitations-heading"><p className="eyebrow">SHARED WITH YOU</p><h1>Invitations</h1><p className="intro">Lists you join will show up on your dashboard after you accept.</p></section>
-    {invitations.length === 0 ? <section className="invitation-empty"><span aria-hidden="true">✉</span><h2>You’re all caught up</h2><p>New list invitations will appear here.</p></section> : <section className="invitation-list" aria-label="Pending invitations">{invitations.map((invitation) => {
+    <section className="invitations-heading"><h1>Invitations</h1><p className="intro">Lists you join will show up on your dashboard after you accept.</p></section>
+    {invitations.length === 0 ? <section className="invitation-empty"><span aria-hidden="true"><MailIcon/></span><h2>You’re all caught up</h2><p>New list invitations will appear here.</p></section> : <section className="invitation-list" aria-label="Pending invitations">{invitations.map((invitation) => {
       const expired = invitation.expiresAt <= now;
       const roleLabel = invitation.role === "EDITOR" ? "Can edit tasks" : "Can view tasks";
       return <article className={`invitation-card ${expired ? "invitation-expired" : ""}`} key={invitation.id}>

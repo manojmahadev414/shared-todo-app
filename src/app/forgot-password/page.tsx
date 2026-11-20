@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { ArrowLeftIcon } from "@/app/icons";
 
 export default function ForgotPasswordPage() {
   const [message, setMessage] = useState("");
@@ -18,5 +19,5 @@ export default function ForgotPasswordPage() {
     else setMessage("If an account uses this address, a password reset link is on its way.");
   }
 
-  return <main className="auth-page"><Link href="/sign-in" className="back-link">← Sign in</Link><section className="auth-card"><p className="eyebrow">ACCOUNT RECOVERY</p><h1>Forgot your<br/>password?</h1><p className="intro">Enter your account email and we’ll send a reset link if it matches an account.</p><form onSubmit={submit} className="auth-form"><label>Email address<input name="email" type="email" autoComplete="email" required /></label>{message && <p className="form-success" role="status">{message}</p>}{error && <p className="form-error" role="alert">{error}</p>}<button className="button button-primary" disabled={busy}>{busy ? "Sending…" : "Send reset link"}</button></form><div className="auth-switch"><Link href="/verify-email">Need a verification link?</Link></div></section></main>;
+  return <main className="auth-page"><Link href="/sign-in" className="back-link"><ArrowLeftIcon/>Sign in</Link><section className="auth-card"><p className="eyebrow">ACCOUNT RECOVERY</p><h1>Forgot your<br/>password?</h1><p className="intro">Enter your account email and we’ll send a reset link if it matches an account.</p><form onSubmit={submit} className="auth-form"><label>Email address<input name="email" type="email" autoComplete="email" required /></label>{message && <p className="form-success" role="status">{message}</p>}{error && <p className="form-error" role="alert">{error}</p>}<button className="button button-primary" disabled={busy}>{busy ? "Sending…" : "Send reset link"}</button></form><div className="auth-switch"><Link href="/verify-email">Need a verification link?</Link></div></section></main>;
 }

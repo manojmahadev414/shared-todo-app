@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { TaskItem } from "@/app/dashboard/task-item";
 import { WorkspaceHeader } from "@/app/dashboard/workspace-header";
+import { CheckIcon } from "@/app/icons";
 
 type View = "today" | "upcoming";
 
@@ -61,8 +62,8 @@ export async function DueTaskView({ view }: { view: View }) {
     : "Open tasks due after today, across your shared lists.";
 
   return <main className="dashboard-shell"><WorkspaceHeader userId={user.id} name={user.name} active={view}/>
-    <section className="due-tasks-heading"><p className="eyebrow">YOUR TASKS</p><h1>{title}</h1><p className="intro">{intro}</p><p className="due-task-count">{count} open {count === 1 ? "task" : "tasks"}</p></section>
-    {groups.length === 0 ? <section className="invitation-empty due-task-empty"><span aria-hidden="true">✓</span><h2>{view === "today" ? "Nothing due today" : "Nothing coming up"}</h2><p>{view === "today" ? "You’re clear of overdue and due-today tasks." : "Add a due date to a task and it’ll show up here."}</p></section> : <div className="due-task-groups">{groups.map((group) => <section className="due-task-group" key={group.key}><header><h2>{group.title}</h2><span>{group.tasks.length}</span></header><div className="due-task-list">{group.tasks.map((task) => {
+    <section className="due-tasks-heading"><h1>{title}</h1><p className="intro">{intro}</p><p className="due-task-count">{count} open {count === 1 ? "task" : "tasks"}</p></section>
+    {groups.length === 0 ? <section className="invitation-empty due-task-empty"><span aria-hidden="true"><CheckIcon/></span><h2>{view === "today" ? "Nothing due today" : "Nothing coming up"}</h2><p>{view === "today" ? "You’re clear of overdue and due-today tasks." : "Add a due date to a task and it’ll show up here."}</p></section> : <div className="due-task-groups">{groups.map((group) => <section className="due-task-group" key={group.key}><header><h2>{group.title}</h2><span>{group.tasks.length}</span></header><div className="due-task-list">{group.tasks.map((task) => {
       const membership = task.list.memberships[0];
       const canEdit = task.list.ownerId === user.id || membership?.role === "EDITOR";
       return <article className="due-task-row" key={task.id}><div className="due-task-list-name">{task.list.name}</div><TaskItem task={task} canEdit={canEdit}/></article>;
