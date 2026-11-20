@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { ArrowLeftIcon } from "@/app/icons";
 
-export function SignInForm({ googleEnabled }: { googleEnabled: boolean }) {
+export function SignInForm({ googleEnabled, initialError = "" }: { googleEnabled: boolean; initialError?: string }) {
   const router = useRouter();
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError);
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -19,7 +19,7 @@ export function SignInForm({ googleEnabled }: { googleEnabled: boolean }) {
   }
   async function signInWithGoogle() {
     setError(""); setGoogleBusy(true);
-    const result = await authClient.signIn.social({ provider: "google", callbackURL: "/dashboard" });
+    const result = await authClient.signIn.social({ provider: "google", callbackURL: "/dashboard", errorCallbackURL: "/sign-in" });
     // On success the browser is already navigating to Google; only failures land here.
     if (result.error) { setGoogleBusy(false); setError("Google sign-in is unavailable right now. Please use your email and password."); }
   }
