@@ -7,9 +7,10 @@ import { TaskItem } from "./task-item";
 import { ListLifecycleControls } from "./list-lifecycle-controls";
 import { WorkspaceHeader } from "./workspace-header";
 import { PlusIcon } from "@/app/icons";
+import { SubmitButton } from "@/app/submit-button";
 
 function NewTaskForm({ listId, listName }: { listId: string; listName: string }) {
-  return <form action={createTask} className="new-task-form"><input type="hidden" name="listId" value={listId}/><div className="new-task-main"><input name="title" placeholder="Add a task…" aria-label={`Add task to ${listName}`} maxLength={200} required/><button aria-label="Add task"><PlusIcon/></button></div><details className="task-extra-fields"><summary>Description, due date, priority</summary><label>Description<textarea name="description" maxLength={5000} rows={2} placeholder="Add a little more detail"/></label><div className="task-edit-fields"><label>Due date<input type="date" name="dueAt"/></label><label>Priority<select name="priority" defaultValue="NORMAL"><option value="LOW">Low</option><option value="NORMAL">Normal</option><option value="HIGH">High</option></select></label></div></details></form>;
+  return <form action={createTask} className="new-task-form"><input type="hidden" name="listId" value={listId}/><div className="new-task-main"><input name="title" placeholder="Add a task…" aria-label={`Add task to ${listName}`} maxLength={200} required/><SubmitButton aria-label="Add task"><PlusIcon/></SubmitButton></div><details className="task-extra-fields"><summary>Description, due date, priority</summary><label>Description<textarea name="description" maxLength={5000} rows={2} placeholder="Add a little more detail"/></label><div className="task-edit-fields"><label>Due date<input type="date" name="dueAt"/></label><label>Priority<select name="priority" defaultValue="NORMAL"><option value="LOW">Low</option><option value="NORMAL">Normal</option><option value="HIGH">High</option></select></label></div></details></form>;
 }
 
 export default async function DashboardPage() {
@@ -27,7 +28,7 @@ export default async function DashboardPage() {
   const openCount = lists.reduce((total, list) => total + list.tasks.filter((task) => !task.completedAt).length, 0);
   return <main className="dashboard-shell">
     <WorkspaceHeader userId={user.id} name={user.name} active="lists"/>
-    <section className="dashboard-heading"><div><h1>Good to see you, {user.name.split(" ")[0]}.</h1><p className="intro">{openCount ? `You have ${openCount} open ${openCount === 1 ? "task" : "tasks"} across your lists.` : "Everything is caught up. Add a task when you’re ready."}</p></div><form action={createList} className="new-list-form"><input name="name" aria-label="New list name" placeholder="Name a new list" maxLength={100} required /><button className="button button-primary">Add list</button></form></section>
+    <section className="dashboard-heading"><div><h1>Good to see you, {user.name.split(" ")[0]}.</h1><p className="intro">{openCount ? `You have ${openCount} open ${openCount === 1 ? "task" : "tasks"} across your lists.` : "Everything is caught up. Add a task when you’re ready."}</p></div><form action={createList} className="new-list-form"><input name="name" aria-label="New list name" placeholder="Name a new list" maxLength={100} required /><SubmitButton className="button button-primary" pendingLabel="Adding…">Add list</SubmitButton></form></section>
     {lists.length === 0 ? <p className="empty-state">Your lists will appear here.</p> : <MasonryGrid>{lists.map((list) => {
       const role = list.ownerId === user.id ? "OWNER" : list.memberships.find((member) => member.userId === user.id)?.role ?? "VIEWER";
       const canEdit = role === "OWNER" || role === "EDITOR";
