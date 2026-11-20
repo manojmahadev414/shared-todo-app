@@ -28,7 +28,7 @@ async function home() {
             <a className="button button-primary" href="/sign-in">Sign in</a>
             <a className="button button-secondary" href="/sign-up">Create an account</a>
           </div>
-          <p className="note">Your lists stay private until you choose to share them.</p>
+          <p className="note">Your lists stay private until you choose to share them. <a className="note-link" href="/privacy">Privacy policy</a></p>
         </section>
         <aside className="visual-panel" aria-label="A preview of a shared task list">
           <div className="sun"></div>
